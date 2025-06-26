@@ -65,4 +65,9 @@ public static boolean isValidNum(String strNum)
     }
     return true;
 }
+
+
+    //TODO GameUtils.checkSolution() method,
+
+    // GameUtils.matchedPieces() method >>> use hashset again
 }

@@ -93,6 +93,28 @@ public class Main {
 
            //main game logic
 //TODO do-while loop that gets user input do essentially a REPL loop
+        //if the player finds the code, they win, and the game stops
+        //a misplaced piece is a piece that is present in the secret
+        //code but is not in a good position
+
+        //TODO GameUtils.checkSolution() method, GameUtils.matchedPieces() method
+
+        //Will you find the secret code?
+        //---
+        //Round O
+        //>1234
+        //Well placed pieces: 0
+        //Misplaced pieces: 1
+        //---
+        //>tata
+        //Wrong Input!
+        //>4123
+        //Well placed pieces: 1
+        //Misplaced pieces: 2
+        //---
+        //Round 2
+        //>0123
+        //Congrats! You did it!
 
         //closing scanner
         in.close();
