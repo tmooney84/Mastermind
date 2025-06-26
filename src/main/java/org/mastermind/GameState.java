@@ -1,6 +1,8 @@
 package org.mastermind;
 
-import java.util.Random;
+import java.util.*;
+
+import static org.mastermind.GameUtils.*;
 
 public class GameState {
     private static final int NUM_PIECES = 4;
@@ -21,40 +23,17 @@ public class GameState {
         this.secretCode = secretCode;
     }
 
-    public static String randomCode()
-    {
-        Random  random = new Random();
-        StringBuilder code = new StringBuilder();
-        //***needs to be distinct pieces
-        for(int i = 0; i < NUM_PIECES; i++)
-        {
-           code.append(random.nextInt());
-        }
 
-        return code.toString();
-    }
 
-    public static void argPrint()
-    {
-        System.out.printf("Try Again...Please enter arguments in any of the following formats:\n" +
-                "-c [CODE]\n" +
-                "-t [ATTEMPTS]\n" +
-                "-c [CODE] -t [ATTEMPTS]\n" +
-                "-t [ATTEMPTS] -c [CODE]     ...limited to only 4 integer digits]\n");
-    }
+//    public static void argPrint()
+//    {
+//        System.out.printf("Try Again...Please enter arguments in any of the following formats:\n" +
+//                "-c [CODE]\n" +
+//                "-t [ATTEMPTS]\n" +
+//                "-c [CODE] -t [ATTEMPTS]\n" +
+//                "-t [ATTEMPTS] -c [CODE]     ...limited to only 4 integer digits]\n");
+//    }
 
-    public static boolean checkNum(String num)
-    {
-        for(int i = 0; i < NUM_PIECES; i++)
-        {
-            if(num.charAt(i) < '0' || num.charAt(i) > '9')
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     public void setSecretCode(String secretCode) {
         this.secretCode = secretCode;
@@ -81,6 +60,8 @@ public class GameState {
     {
         return round;
     }
-
-
+    public static int getNumPieces()
+    {
+        return NUM_PIECES;
+    }
 }

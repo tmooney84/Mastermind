@@ -30,70 +30,68 @@ public class Main {
                 System.out.println("Incorrect input. Please enter 's' or 'm' to continue");
             }
         }while(!singlePlayerFlag && !multiPlayerFlag);
-            //Default Settings, Custom Settings???
 
+
+            //Default Settings, Custom Settings??? >>> could be a tab to click otherwise defaults
+            //could change number of pieces, letters, etc.
+
+        //Enter custom code?
+        boolean codeChosen = false;
         do {
             System.out.println("Enter 'r' for random code or 'c' for custom code");
             String input = in.nextLine();
 
-            if (input.equalsIgnoreCase("s")) {
-                singlePlayerFlag = true;
-            } else if (input.equalsIgnoreCase("m")) {
-                multiPlayerFlag = true;
+            if (input.equalsIgnoreCase("r")) {
+                codeChosen = true;
+                String secretCode = GameUtils.randomCode();
+                currentGame.setSecretCode(secretCode);
+            } else if (input.equalsIgnoreCase("c")) {
+                codeChosen = true;
+                boolean validCode = false;
+                do {
+                    System.out.println("Please enter 4-digit code with unique values between 0 and 8. ie: 4537");
+                    String code = in.nextLine();
+                    if (GameUtils.isValidCode(code)) {
+                        currentGame.setSecretCode(code);
+                        System.out.println("Custom Secret Code Set.");
+                        validCode = true;
+                    } else {
+                        System.out.println("Invalid code. Please enter 4-digit code with unique values between 0 and 8. ie: 4537");
+                    }
+                }while(!validCode);
+
+            } else {
+                System.out.println("Incorrect input. Please enter 'r' for random code or 'c' for custom code");
+            }
+        }while(!codeChosen);
+
+            //How many attempts?
+            boolean setAttemptsFlag = false;
+        do {
+            //???maybe describe with [10 Attempts] or different amount for multiplayer
+            System.out.println("Enter how many guesses the player is given or 'd' for default.");
+            String input = in.nextLine();
+
+            if (input.equalsIgnoreCase("d")) {
+                setAttemptsFlag = true;
+
+            } else if(GameUtils.isValidNum(input)) {
+                int num = Integer.parseInt(input);
+                currentGame.setAttempts(num);
+                setAttemptsFlag = true;
             } else {
                 System.out.println("Incorrect input. Please enter 's' or 'm' to continue");
             }
-        }while(!singlePlayerFlag && !multiPlayerFlag);
+        }while(!setAttemptsFlag);
+
+//testing initial input
+        String res = singlePlayerFlag ? "Single Player" : "Multiplayer";
+        System.out.println("Player Number Status: " + res);  //single vs. multiplayer
+        System.out.println("Secret code: " + currentGame.getSecretCode());
+        System.out.println("Number of Attempts: " + currentGame.getAttempts());
 
 
-        //Enter custom code?
-            //How many attempts?
-
-
-// parsing command line input
-            if(args.length < 2 || args.length > 5)
-            {
-                GameState.argPrint();
-                System.exit(1);
-            }
-
-            if(args.length == 3 && args[1].equals("-c"))
-            {
-//TODO make sure to abstract as much as possible
-                char[] nChars = args[2].toCharArray();
-                boolean isDigit = true;
-                for(char nChar:nChars)
-                {
-                   if(!Character.isDigit(nChar))
-                   {
-                       isDigit = false;
-                   }
-                }
-                System.out.println("Error... ")
-
-                if(args[2])
-                currentGame.setSecretCode(args[2])
-            //need to convert string to CharacterArray
-            Character.isDigit
-
-            }
-
-            else if(args.length == 3 && args[1].equals("-t"))
-            {
-
-            }
-
-            else if((args.length == 5 && args[1].equals("-c")) && args[3].equals("-t"))
-            {
-
-            }
-
-            else if((args.length == 5 && args[1].equals("-t")) && args[3].equals("-c"))
-            {
-
-            }
-
-            //main game logic
+           //main game logic
 //TODO do-while loop that gets user input do essentially a REPL loop
 
         //closing scanner
