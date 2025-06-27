@@ -13,21 +13,18 @@ public class GameState {
     private String secretCode;
     private int attempts;
     private int round;
+    private boolean codeFound;
 
-
-    public GameState()
-    {
-       this.attempts = 10;
-       this.round = 0;
-       this.secretCode = randomCode();
+    public GameState() {
+        this.attempts = 10;
+        this.round = 0;
+        this.secretCode = randomCode();
+        this.codeFound = false;
     }
 
-    public GameState(String secretCode)
-    {
+    public GameState(String secretCode) {
         this.secretCode = secretCode;
     }
-
-
 
 //    public static void argPrint()
 //    {
@@ -37,7 +34,6 @@ public class GameState {
 //                "-c [CODE] -t [ATTEMPTS]\n" +
 //                "-t [ATTEMPTS] -c [CODE]     ...limited to only 4 integer digits]\n");
 //    }
-
 
     public void setSecretCode(String secretCode) {
         this.secretCode = secretCode;
@@ -51,33 +47,41 @@ public class GameState {
         this.round = round;
     }
 
-    public String getSecretCode(){
+    public void setCodeFound(boolean codeFound) {
+        this.codeFound = codeFound;
+    }
+
+    public String getSecretCode() {
         return secretCode;
     }
 
-    public int getAttempts()
-    {
+    public int getAttempts() {
         return attempts;
     }
 
-    public int getRound()
-    {
+    public int getRound() {
         return round;
     }
-    public static int getNumPieces()
-    {
+
+    public boolean getCodeFound() {
+        return codeFound;
+    }
+
+
+    public static int getNumPieces() {
         return NUM_PIECES;
     }
-    public static int getLowNum()
-    {
+
+    public static int getLowNum() {
         return LOW_NUM;
     }
-    public static int getHighNum()
-    {
+
+    public static int getHighNum() {
         return HIGH_NUM;
     }
-    public static int getMaxAttempts()
-    {
+
+    public static int getMaxAttempts() {
         return MAX_ATTEMPTS;
     }
 }
+

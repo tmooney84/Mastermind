@@ -54,7 +54,7 @@ public class Main {
                     System.out.println("Please enter 4-digit code with unique values between "
                             + GameState.getLowNum() + " and " + GameState.getHighNum() + " ie: 4537");
                     String code = in.nextLine();
-                    if (GameUtils.isValidCode(code)) {
+                    if (GameUtils.checkUniqueNumbers(code)) {
                         currentGame.setSecretCode(code);
                         System.out.println("Custom Secret Code Set.");
                         validCode = true;
@@ -77,19 +77,15 @@ public class Main {
             //********** is a in.nextLine(); needed?
             if (input.equalsIgnoreCase("d")) {
                 setAttemptsFlag = true;
-            }
-            else if (GameUtils.isValidNum(input)) {
+            } else if (GameUtils.isValidNum(input)) {
                 int num = Integer.parseInt(input);
-                if(num <= GameState.getMaxAttempts())
-                {
+                if (num <= GameState.getMaxAttempts()) {
                     currentGame.setAttempts(num);
                     setAttemptsFlag = true;
-                }
-                else{
+                } else {
                     System.out.println("Input exceeds maximum allowable attempts.");
                 }
-            }
-            else {
+            } else {
                 System.out.println("Incorrect input.");
             }
         } while (!setAttemptsFlag);
@@ -107,65 +103,60 @@ public class Main {
         //a misplaced piece is a piece that is present in the secret
         //code but is not in a good position
 
-            int round = currentGame.getRound();
-            System.out.println("Will you find the secret code");
-//TODO NEED TO DEBUG WHETHER 'D' IS LEFT OVER IN THE QUEUE SINCE THIS LOOP IS NOT FUNCTIONING CORRECTLY
-            do{
-                boolean numFlag = false;
-                String code = "";
-                do {
-                    System.out.println("---");
-                    System.out.println("Round " + round);
-                    System.out.print(">");
-                    code = in.nextLine();
+        int round = currentGame.getRound();
+        int attempts = currentGame.getAttempts();
 
-                    if (GameUtils.isValidPotCode(code, low, high)) {
-                        System.out.println("Wrong input!");
-                        numFlag = true;
-                    }
-                }while(!numFlag);
+        System.out.println("Will you find the secret code?");
 
-            Integer wellPlaced = 0;
-            Integer misplaced = 0;
+        do {
+            boolean numFlag = false;
+            String code = "";
+            RoundData currentRoundData = new RoundData();
 
-            if (GameUtils.checkSolution(currentGame, code, wellPlaced, misplaced))
-            {
-                codeFound = true;
-            }
-            else {
-                System.out.println("Well placed pieces: " + wellPlaced);
-                System.out.println("Misplaced pieces: " + misplaced);
+            do {
+                System.out.println("---");
+                System.out.println("Round " + round);
+                System.out.print(">");
+                code = in.nextLine();
+
+                if (!GameUtils.isValidPotCode(code, low, high)) {
+                    System.out.println("Wrong input!");
+                } else
+                    numFlag = true;
+            } while (!numFlag);
+
+            if (GameUtils.checkSolution(currentGame, code, currentRoundData)) {
+                currentGame.setCodeFound(true);
+            } else {
+                System.out.println("Well placed pieces: " + currentRoundData.getWellPlaced());
+                System.out.println("Misplaced pieces: " + currentRoundData.getMisplaced());
                 currentGame.setRound(round++);
             }
-        }while(!codeFound && round < currentGame.getAttempts());
+        } while (!codeFound && round < attempts);
 
-        if(codeFound)
-        {
-           System.out.println("Congrats! You win!");
-        }
-        else if(!codeFound)
-        {
+        if (codeFound) {
+            System.out.println("Congrats! You win!");
+        } else if (!codeFound) {
             System.out.println("Sorry, you lose");
         }
-
-
-        //---
-        //Round O
-        //>1234
-        //Well placed pieces: 0
-        //Misplaced pieces: 1
-        //---
-        //>tata
-        //Wrong Input!
-        //>4123
-        //Well placed pieces: 1
-        //Misplaced pieces: 2
-        //---
-        //Round 2
-        //>0123
-        //Congrats! You did it!
 
         //closing scanner
         in.close();
     }
 }
+
+//---
+//Round O
+//>1234
+//Well placed pieces: 0
+//Misplaced pieces: 1
+//---
+//>tata
+//Wrong Input!
+//>4123
+//Well placed pieces: 1
+//Misplaced pieces: 2
+//---
+//Round 2
+//>0123
+//Congrats! You did it!

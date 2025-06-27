@@ -4,25 +4,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import static org.mastermind.GameState.*;
 
 public class GameUtils {
-    public static boolean isValidCode(String code)
-    {
-        if(code.length() != 4){
+    //unique digits compose number
+    public static boolean checkUniqueNumbers(String code) {
+        int numPieces = GameState.getNumPieces();
+        if (code.length() != numPieces) {
             return false;
         }
         Set<Character> seenDigits = new HashSet<>();
         int length = code.length();
-        for(int i = 0; i < length; i++)
-        {
+        for (int i = 0; i < length; i++) {
             char c = code.charAt(i);
 
-            if(c < '0' || c > '8'){
+            if (c < '0' || c > '8') {
                 return false;
             }
 
-            if(seenDigits.contains(c)){
+            if (seenDigits.contains(c)) {
                 return false;
             }
             seenDigits.add(c);
@@ -30,102 +29,93 @@ public class GameUtils {
         return true;
     }
 
-public static String randomCode()
-{
-    ArrayList<Integer> digits = new ArrayList<>();
-    int NUM_PIECES = GameState.getNumPieces();
-    int low = GameState.getLowNum();
-    int high = GameState.getHighNum();
-    for(int i = low; i <= high; i++)
-    {
-        digits.add(i);
+    public static String randomCode() {
+        ArrayList<Integer> digits = new ArrayList<>();
+        int NUM_PIECES = GameState.getNumPieces();
+        int low = GameState.getLowNum();
+        int high = GameState.getHighNum();
+        for (int i = low; i <= high; i++) {
+            digits.add(i);
+        }
+
+        //same seed for replaying game state
+        Collections.shuffle(digits);
+
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < NUM_PIECES; i++) {
+            code.append(digits.get(i));
+        }
+
+        return code.toString();
     }
 
-    //same seed for replaying game state
-    Collections.shuffle(digits);
-
-    StringBuilder code = new StringBuilder();
-    for(int i = 0; i < NUM_PIECES; i++)
-    {
-        code.append(digits.get(i));
-    }
-
-    return code.toString();
-}
-
-    public static boolean isValidNum(String strNum)
-    {
-        if(strNum == null)
-        {
+    public static boolean isValidNum(String strNum) {
+        if (strNum == null) {
             return false;
         }
-        try{
+        try {
             int i = Integer.parseInt(strNum);
-        }catch (NumberFormatException nfe){
+        } catch (NumberFormatException nfe) {
             return false;
         }
         return true;
     }
 
-//Validating that a code could potentially work
-public static boolean isValidPotCode(String strNum, int low, int high)
-{
-    if(strNum == null || strNum.trim().isEmpty())
-    {
-        return false;
-    }
+    //Validating that a code could potentially work
+    public static boolean isValidPotCode(String strNum, int low, int high) {
+        if (strNum == null || strNum.trim().isEmpty()) {
+            return false;
+        }
 
-    int numLen = strNum.length();
+        if (!checkUniqueNumbers(strNum)) {
+            return false;
+        }
 
-    for(int i = 0; i < numLen; i++)
-    {
-       char c = strNum.charAt(i);
-       if(c < (char) low || c > (char) high)
-       {
-           return false;
-       }
+        int numLen = strNum.length();
+
+        for (int i = 0; i < numLen; i++) {
+            char c = strNum.charAt(i);
+            if (c < (char) (low + '0') || c > (char) (high + '0')) {
+                return false;
+            }
+        }
+        return true;
     }
-    return true;
-}
 
 
     // TODO GameUtils.checkSolution() method
-    public static boolean checkSolution(GameState currentGame, String numString, Integer wellPlaced, Integer misplaced)
-    {
+    public static boolean checkSolution(GameState currentGame, String numString, RoundData data) {
         String secretCode = currentGame.getSecretCode();
         int sLength = secretCode.length();
 
         Set<Character> secretSet = new HashSet<>();
-        for(char c : secretCode.toCharArray()){
-           secretSet.add(c);
+        for (char c : secretCode.toCharArray()) {
+            secretSet.add(c);
         }
 
         int nLength = numString.length();
         boolean matchedCode = true;
 
-        if(!isValidCode(numString) || sLength != nLength)
-        {
-           matchedCode = false;
-        }
-        else
-        {
+        if (!checkUniqueNumbers(numString) || sLength != nLength) {
+            matchedCode = false;
+        } else {
             int len = numString.length();
-            for(int i = 0; i < len; i++)
-            {
-                if(numString.charAt(i) != secretCode.charAt(i))
-                {
-                   matchedCode = false;
+            int misplaced = 0;
+            int wellPlaced = 0;
 
-                    if(secretSet.contains(numString.charAt(i)))
-                    {
+            for (int i = 0; i < len; i++) {
+                if (numString.charAt(i) != secretCode.charAt(i)) {
+                    matchedCode = false;
+
+                    if (secretSet.contains(numString.charAt(i))) {
                         misplaced++;
                     }
-                }
-                else if(numString.charAt(i) == secretCode.charAt(i))
-                {
-                   wellPlaced++;
+                } else if (numString.charAt(i) == secretCode.charAt(i)) {
+                    wellPlaced++;
                 }
             }
+            data.setMisplaced(misplaced);
+            data.setWellPlaced(wellPlaced);
         }
         return matchedCode;
     }
