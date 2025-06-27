@@ -52,7 +52,8 @@ public static String randomCode()
     return code.toString();
 }
 
-public static boolean isValidNum(String strNum)
+//need to put range of what is acceptable for a number
+public static boolean isValidNum(String strNum, int low, high)
 {
     if(strNum == null)
     {
@@ -67,7 +68,46 @@ public static boolean isValidNum(String strNum)
 }
 
 
-    //TODO GameUtils.checkSolution() method,
+    // TODO GameUtils.checkSolution() method
+    public static boolean checkSolution(GameState currentGame, String numString, Integer wellPlaced, Integer misplaced)
+    {
+        String secretCode = currentGame.getSecretCode();
+        int sLength = secretCode.length();
+
+        Set<Character> secretSet = new HashSet<>();
+        for(char c : secretCode.toCharArray()){
+           secretSet.add(c);
+        }
+
+        int nLength = numString.length();
+        boolean matchedCode = true;
+
+        if(!isValidCode(numString) || sLength != nLength)
+        {
+           matchedCode = false;
+        }
+        else
+        {
+            int len = numString.length();
+            for(int i = 0; i < len; i++)
+            {
+                if(numString.charAt(i) != secretCode.charAt(i))
+                {
+                   matchedCode = false;
+
+                    if(secretSet.contains(numString.charAt(i)))
+                    {
+                        misplaced++;
+                    }
+                }
+                else if(numString.charAt(i) == secretCode.charAt(i))
+                {
+                   wellPlaced++;
+                }
+            }
+        }
+        return matchedCode;
+    }
 
     // GameUtils.matchedPieces() method >>> use hashset again
 }
