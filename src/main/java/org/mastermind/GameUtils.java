@@ -33,8 +33,10 @@ public class GameUtils {
 public static String randomCode()
 {
     ArrayList<Integer> digits = new ArrayList<>();
-
-    for(int i = 0; i <= 8; i++)
+    int NUM_PIECES = GameState.getNumPieces();
+    int low = GameState.getLowNum();
+    int high = GameState.getHighNum();
+    for(int i = low; i <= high; i++)
     {
         digits.add(i);
     }
@@ -43,7 +45,6 @@ public static String randomCode()
     Collections.shuffle(digits);
 
     StringBuilder code = new StringBuilder();
-    int NUM_PIECES = GameState.getNumPieces();
     for(int i = 0; i < NUM_PIECES; i++)
     {
         code.append(digits.get(i));
@@ -66,10 +67,10 @@ public static String randomCode()
         return true;
     }
 
-//need to put range of what is acceptable for a number
+//Validating that a code could potentially work
 public static boolean isValidPotCode(String strNum, int low, int high)
 {
-    if(strNum == null || strNum.equals(" "))
+    if(strNum == null || strNum.trim().isEmpty())
     {
         return false;
     }
@@ -79,7 +80,7 @@ public static boolean isValidPotCode(String strNum, int low, int high)
     for(int i = 0; i < numLen; i++)
     {
        char c = strNum.charAt(i);
-       if(c < low || c > high)
+       if(c < (char) low || c > (char) high)
        {
            return false;
        }

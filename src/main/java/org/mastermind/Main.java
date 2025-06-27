@@ -74,7 +74,7 @@ public class Main {
             //???maybe describe with [10 Attempts] or different amount for multiplayer
             System.out.println("Enter how many attempts the player is given or 'd' for default.");
             String input = in.nextLine();
-
+            //********** is a in.nextLine(); needed?
             if (input.equalsIgnoreCase("d")) {
                 setAttemptsFlag = true;
             }
@@ -109,13 +109,13 @@ public class Main {
 
             int round = currentGame.getRound();
             System.out.println("Will you find the secret code");
-
+//TODO NEED TO DEBUG WHETHER 'D' IS LEFT OVER IN THE QUEUE SINCE THIS LOOP IS NOT FUNCTIONING CORRECTLY
             do{
                 boolean numFlag = false;
                 String code = "";
                 do {
                     System.out.println("---");
-                    System.out.println("Round" + currentGame.getRound());
+                    System.out.println("Round " + round);
                     System.out.print(">");
                     code = in.nextLine();
 
