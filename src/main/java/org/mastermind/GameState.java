@@ -9,6 +9,7 @@ public class GameState {
     private static final int NUM_PIECES = 4;
     private static final int LOW_NUM = 0;
     private static final int HIGH_NUM = 8;
+    private static final int MAX_ATTEMPTS = 100;
     private String secretCode;
     private int attempts;
     private int round;
@@ -74,5 +75,9 @@ public class GameState {
     public static int getHighNum()
     {
         return HIGH_NUM;
+    }
+    public static int getMaxAttempts()
+    {
+        return MAX_ATTEMPTS;
     }
 }

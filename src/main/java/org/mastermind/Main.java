@@ -11,6 +11,9 @@ public class Main {
         GameState currentGame = new GameState();
         Scanner in = new Scanner(System.in);
 
+        int low = GameState.getLowNum();
+        int high = GameState.getHighNum();
+
         //intro banner for command line version
         System.out.println("Welcome to Mastermind!");
         System.out.println();
@@ -48,7 +51,8 @@ public class Main {
                 codeChosen = true;
                 boolean validCode = false;
                 do {
-                    System.out.println("Please enter 4-digit code with unique values between 0 and 8. ie: 4537");
+                    System.out.println("Please enter 4-digit code with unique values between "
+                            + GameState.getLowNum() + " and " + GameState.getHighNum() + " ie: 4537");
                     String code = in.nextLine();
                     if (GameUtils.isValidCode(code)) {
                         currentGame.setSecretCode(code);
@@ -68,18 +72,25 @@ public class Main {
         boolean setAttemptsFlag = false;
         do {
             //???maybe describe with [10 Attempts] or different amount for multiplayer
-            System.out.println("Enter how many guesses the player is given or 'd' for default.");
+            System.out.println("Enter how many attempts the player is given or 'd' for default.");
             String input = in.nextLine();
 
             if (input.equalsIgnoreCase("d")) {
                 setAttemptsFlag = true;
-
-            } else if (GameUtils.isValidNum(input, low, high)) {
+            }
+            else if (GameUtils.isValidNum(input)) {
                 int num = Integer.parseInt(input);
-                currentGame.setAttempts(num);
-                setAttemptsFlag = true;
-            } else {
-                System.out.println("Incorrect input. Please enter 's' or 'm' to continue");
+                if(num <= GameState.getMaxAttempts())
+                {
+                    currentGame.setAttempts(num);
+                    setAttemptsFlag = true;
+                }
+                else{
+                    System.out.println("Input exceeds maximum allowable attempts.");
+                }
+            }
+            else {
+                System.out.println("Incorrect input.");
             }
         } while (!setAttemptsFlag);
 
@@ -97,9 +108,6 @@ public class Main {
         //code but is not in a good position
 
             int round = currentGame.getRound();
-            int low = GameState.getLowNum();
-            int high = GameState.getHighNum();
-
             System.out.println("Will you find the secret code");
 
             do{
@@ -111,7 +119,7 @@ public class Main {
                     System.out.print(">");
                     code = in.nextLine();
 
-                    if (GameUtils.isValidNum(code, low, high)) {
+                    if (GameUtils.isValidPotCode(code, low, high)) {
                         System.out.println("Wrong input!");
                         numFlag = true;
                     }

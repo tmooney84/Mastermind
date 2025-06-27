@@ -52,8 +52,22 @@ public static String randomCode()
     return code.toString();
 }
 
+    public static boolean isValidNum(String strNum)
+    {
+        if(strNum == null)
+        {
+            return false;
+        }
+        try{
+            int i = Integer.parseInt(strNum);
+        }catch (NumberFormatException nfe){
+            return false;
+        }
+        return true;
+    }
+
 //need to put range of what is acceptable for a number
-public static boolean isValidNum(String strNum, int low, int high)
+public static boolean isValidPotCode(String strNum, int low, int high)
 {
     if(strNum == null || strNum.equals(" "))
     {
