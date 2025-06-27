@@ -74,7 +74,7 @@ public class Main {
             if (input.equalsIgnoreCase("d")) {
                 setAttemptsFlag = true;
 
-            } else if (GameUtils.isValidNum(input)) {
+            } else if (GameUtils.isValidNum(input, low, high)) {
                 int num = Integer.parseInt(input);
                 currentGame.setAttempts(num);
                 setAttemptsFlag = true;
@@ -97,13 +97,25 @@ public class Main {
         //code but is not in a good position
 
             int round = currentGame.getRound();
-        do{
-            System.out.println("Will you find the secret code");
-            System.out.println("---");
-            System.out.println("Round" + currentGame.getRound());
-            System.out.print(">");
+            int low = GameState.getLowNum();
+            int high = GameState.getHighNum();
 
-            String code = in.nextLine();
+            System.out.println("Will you find the secret code");
+
+            do{
+                boolean numFlag = false;
+                String code = "";
+                do {
+                    System.out.println("---");
+                    System.out.println("Round" + currentGame.getRound());
+                    System.out.print(">");
+                    code = in.nextLine();
+
+                    if (GameUtils.isValidNum(code, low, high)) {
+                        System.out.println("Wrong input!");
+                        numFlag = true;
+                    }
+                }while(!numFlag);
 
             Integer wellPlaced = 0;
             Integer misplaced = 0;

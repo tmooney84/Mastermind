@@ -4,8 +4,11 @@ import java.util.*;
 
 import static org.mastermind.GameUtils.*;
 
+//maybe could split up into game config and game stats if using interfaces and composition?
 public class GameState {
     private static final int NUM_PIECES = 4;
+    private static final int LOW_NUM = 0;
+    private static final int HIGH_NUM = 8;
     private String secretCode;
     private int attempts;
     private int round;
@@ -63,5 +66,13 @@ public class GameState {
     public static int getNumPieces()
     {
         return NUM_PIECES;
+    }
+    public static int getLowNum()
+    {
+        return LOW_NUM;
+    }
+    public static int getHighNum()
+    {
+        return HIGH_NUM;
     }
 }

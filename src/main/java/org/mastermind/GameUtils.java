@@ -53,16 +53,22 @@ public static String randomCode()
 }
 
 //need to put range of what is acceptable for a number
-public static boolean isValidNum(String strNum, int low, high)
+public static boolean isValidNum(String strNum, int low, int high)
 {
-    if(strNum == null)
+    if(strNum == null || strNum.equals(" "))
     {
-       return false;
-    }
-    try{
-        int i = Integer.parseInt(strNum);
-    }catch (NumberFormatException nfe){
         return false;
+    }
+
+    int numLen = strNum.length();
+
+    for(int i = 0; i < numLen; i++)
+    {
+       char c = strNum.charAt(i);
+       if(c < low || c > high)
+       {
+           return false;
+       }
     }
     return true;
 }
