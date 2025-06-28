@@ -7,12 +7,13 @@ public class Main {
     public static void main(String[] args) {
         boolean singlePlayerFlag = false;
         boolean multiPlayerFlag = false;
-        boolean codeFound = false;
         GameState currentGame = new GameState();
         Scanner in = new Scanner(System.in);
 
+        //*********************do I need low and high?
         int low = GameState.getLowNum();
         int high = GameState.getHighNum();
+        boolean codeFound = currentGame.getCodeFound();
 
         //intro banner for command line version
         System.out.println("Welcome to Mastermind!");
@@ -54,7 +55,7 @@ public class Main {
                     System.out.println("Please enter 4-digit code with unique values between "
                             + GameState.getLowNum() + " and " + GameState.getHighNum() + " ie: 4537");
                     String code = in.nextLine();
-                    if (GameUtils.checkUniqueNumbers(code)) {
+                    if (GameUtils.checkUniqueCode(code)) {
                         currentGame.setSecretCode(code);
                         System.out.println("Custom Secret Code Set.");
                         validCode = true;
@@ -107,26 +108,31 @@ public class Main {
         int attempts = currentGame.getAttempts();
 
         System.out.println("Will you find the secret code?");
+        System.out.println("Please enter 4-digit code with unique values between "
+                + GameState.getLowNum() + " and " + GameState.getHighNum());
 
         do {
-            boolean numFlag = false;
             String code = "";
             RoundData currentRoundData = new RoundData();
+            boolean goodCodeFlag = false;
 
-            do {
-                System.out.println("---");
-                System.out.println("Round " + round);
+            System.out.println("---");
+            System.out.println("Round " + round);
+
+            while (!goodCodeFlag) {
                 System.out.print(">");
                 code = in.nextLine();
 
-                if (!GameUtils.isValidPotCode(code, low, high)) {
+                if (!GameUtils.checkUniqueCode(code)) {
                     System.out.println("Wrong input!");
-                } else
-                    numFlag = true;
-            } while (!numFlag);
+                } else {
+                    goodCodeFlag = true;
+                }
+            }
 
             if (GameUtils.checkSolution(currentGame, code, currentRoundData)) {
                 currentGame.setCodeFound(true);
+                codeFound = true;
             } else {
                 System.out.println("Well placed pieces: " + currentRoundData.getWellPlaced());
                 System.out.println("Misplaced pieces: " + currentRoundData.getMisplaced());

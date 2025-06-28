@@ -7,17 +7,21 @@ import java.util.Set;
 
 public class GameUtils {
     //unique digits compose number
-    public static boolean checkUniqueNumbers(String code) {
+    public static boolean checkUniqueCode(String code) {
         int numPieces = GameState.getNumPieces();
         if (code.length() != numPieces) {
             return false;
         }
+
+        int low = GameState.getLowNum();
+        int high = GameState.getHighNum();
+
         Set<Character> seenDigits = new HashSet<>();
         int length = code.length();
         for (int i = 0; i < length; i++) {
             char c = code.charAt(i);
 
-            if (c < '0' || c > '8') {
+            if (c < (char) (low + '0') || c > (char) (high + '0')) {
                 return false;
             }
 
@@ -61,26 +65,26 @@ public class GameUtils {
         return true;
     }
 
-    //Validating that a code could potentially work
-    public static boolean isValidPotCode(String strNum, int low, int high) {
-        if (strNum == null || strNum.trim().isEmpty()) {
-            return false;
-        }
-
-        if (!checkUniqueNumbers(strNum)) {
-            return false;
-        }
-
-        int numLen = strNum.length();
-
-        for (int i = 0; i < numLen; i++) {
-            char c = strNum.charAt(i);
-            if (c < (char) (low + '0') || c > (char) (high + '0')) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    //Validating that a code could potentially work
+//    public static boolean isValidPotCode(String strNum, int low, int high) {
+//        if (strNum == null || strNum.trim().isEmpty()) {
+//            return false;
+//        }
+//
+//        if (!checkUniqueNumbers(strNum)) {
+//            return false;
+//        }
+//
+//        int numLen = strNum.length();
+//
+//        for (int i = 0; i < numLen; i++) {
+//            char c = strNum.charAt(i);
+//            if (c < (char) (low + '0') || c > (char) (high + '0')) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
 
     // TODO GameUtils.checkSolution() method
@@ -96,7 +100,7 @@ public class GameUtils {
         int nLength = numString.length();
         boolean matchedCode = true;
 
-        if (!checkUniqueNumbers(numString) || sLength != nLength) {
+        if (!checkUniqueCode(numString) || sLength != nLength) {
             matchedCode = false;
         } else {
             int len = numString.length();
