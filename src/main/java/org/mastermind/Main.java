@@ -113,6 +113,7 @@ public class Main {
 
         do {
             String code = "";
+            //***could also have a  RoundData Array to track the info of each round???
             RoundData currentRoundData = new RoundData();
             boolean goodCodeFlag = false;
 
@@ -133,6 +134,7 @@ public class Main {
             if (GameUtils.checkSolution(currentGame, code, currentRoundData)) {
                 currentGame.setCodeFound(true);
                 codeFound = true;
+                currentGame.setCodeFound(codeFound);
             } else {
                 System.out.println("Well placed pieces: " + currentRoundData.getWellPlaced());
                 System.out.println("Misplaced pieces: " + currentRoundData.getMisplaced());
