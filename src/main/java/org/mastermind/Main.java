@@ -7,13 +7,13 @@ public class Main {
     public static void main(String[] args) {
         boolean singlePlayerFlag = false;
         boolean multiPlayerFlag = false;
-        GameStats currentGameStats = new GameStats();
-        Scanner in = new Scanner(System.in);
+        boolean configFlag = false;
 
-        //*********************do I need low and high?
-        int low = Config.getLowNum();
-        int high = Config.getHighNum();
+        //TODO Put into the Single Player and Multi Player instead of here
+        GameStats currentGameStats = new GameStats();
         boolean codeFound = currentGameStats.getCodeFound();
+
+        Scanner in = new Scanner(System.in);
 
         //intro banner for command line version
         System.out.println("Welcome to Mastermind!");
@@ -22,13 +22,17 @@ public class Main {
 
         //Single Player, Multiplayer???
         do {
-            System.out.println("Enter 's' for single player or 'm' for multiplayer");
+            System.out.println("Enter 's' for single player, 'm' for multiplayer or 'c' to adjust configuration");
             String input = in.nextLine();
 
             if (input.equalsIgnoreCase("s")) {
                 singlePlayerFlag = true;
             } else if (input.equalsIgnoreCase("m")) {
                 multiPlayerFlag = true;
+            } else if (input.equalsIgnoreCase("c")) {
+                configFlag = true; ///////////////////////////
+
+                //TODO may be a good idea to call the setting config stuff here
             } else {
                 System.out.println("Incorrect input. Please enter 's' or 'm' to continue");
             }
@@ -38,7 +42,24 @@ public class Main {
         //Default Settings, Custom Settings??? >>> could be a tab to click otherwise defaults
         //could change number of pieces, letters, etc.
 
+
+//        if(singlePlayerFlag)
+//        {
+//            //pass in Config config and GameStats stats
+//           //SinglePlayer game = new SinglePlayer(config, stats)
+//        }
+
+//        else if(multiPlayerFlag)
+//        {
+//            //ask 1) Start Server
+//            //    2) Join Game...
+//            //              --> "Enter server name or address"
+//          //Multiplayer game = new Multiplayer
+//        }
+
+
         //Enter custom code?
+        //TODO put into method, potentially could go into GameUtils
         boolean codeChosen = false;
         do {
             System.out.println("Enter 'r' for random code or 'c' for custom code");
@@ -70,6 +91,7 @@ public class Main {
         } while (!codeChosen);
 
         //How many attempts?
+        //TODO put into method, potentially could go into GameUtils
         boolean setAttemptsFlag = false;
         do {
             //???maybe describe with [10 Attempts] or different amount for multiplayer
