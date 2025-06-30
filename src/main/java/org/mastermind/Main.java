@@ -7,13 +7,13 @@ public class Main {
     public static void main(String[] args) {
         boolean singlePlayerFlag = false;
         boolean multiPlayerFlag = false;
-        GameState currentGame = new GameState();
+        GameStats currentGameStats = new GameStats();
         Scanner in = new Scanner(System.in);
 
         //*********************do I need low and high?
-        int low = GameState.getLowNum();
-        int high = GameState.getHighNum();
-        boolean codeFound = currentGame.getCodeFound();
+        int low = Config.getLowNum();
+        int high = Config.getHighNum();
+        boolean codeFound = currentGameStats.getCodeFound();
 
         //intro banner for command line version
         System.out.println("Welcome to Mastermind!");
@@ -47,16 +47,16 @@ public class Main {
             if (input.equalsIgnoreCase("r")) {
                 codeChosen = true;
                 String secretCode = GameUtils.randomCode();
-                currentGame.setSecretCode(secretCode);
+                currentGameStats.setSecretCode(secretCode);
             } else if (input.equalsIgnoreCase("c")) {
                 codeChosen = true;
                 boolean validCode = false;
                 do {
                     System.out.println("Please enter 4-digit code with unique values between "
-                            + GameState.getLowNum() + " and " + GameState.getHighNum() + " ie: 4537");
+                            + Config.getLowNum() + " and " + Config.getHighNum() + " ie: 4537");
                     String code = in.nextLine();
                     if (GameUtils.checkUniqueCode(code)) {
-                        currentGame.setSecretCode(code);
+                        currentGameStats.setSecretCode(code);
                         System.out.println("Custom Secret Code Set.");
                         validCode = true;
                     } else {
@@ -80,8 +80,8 @@ public class Main {
                 setAttemptsFlag = true;
             } else if (GameUtils.isValidNum(input)) {
                 int num = Integer.parseInt(input);
-                if (num <= GameState.getMaxAttempts()) {
-                    currentGame.setAttempts(num);
+                if (num <= Config.getMaxAttempts()) {
+                    currentGameStats.setAttempts(num);
                     setAttemptsFlag = true;
                 } else {
                     System.out.println("Input exceeds maximum allowable attempts.");
@@ -94,8 +94,8 @@ public class Main {
 //testing initial input
         String res = singlePlayerFlag ? "Single Player" : "Multiplayer";
         System.out.println("Player Number Status: " + res);  //single vs. multiplayer
-        System.out.println("Secret code: " + currentGame.getSecretCode());
-        System.out.println("Number of Attempts: " + currentGame.getAttempts());
+        System.out.println("Secret code: " + currentGameStats.getSecretCode());
+        System.out.println("Number of Attempts: " + currentGameStats.getAttempts());
 
 
         //main game logic
@@ -104,12 +104,12 @@ public class Main {
         //a misplaced piece is a piece that is present in the secret
         //code but is not in a good position
 
-        int round = currentGame.getRound();
-        int attempts = currentGame.getAttempts();
+        int round = currentGameStats.getRound();
+        int attempts = currentGameStats.getAttempts();
 
         System.out.println("Will you find the secret code?");
         System.out.println("Please enter 4-digit code with unique values between "
-                + GameState.getLowNum() + " and " + GameState.getHighNum());
+                + Config.getLowNum() + " and " + Config.getHighNum());
 
         do {
             String code = "";
@@ -131,14 +131,14 @@ public class Main {
                 }
             }
 
-            if (GameUtils.checkSolution(currentGame, code, currentRoundData)) {
-                currentGame.setCodeFound(true);
+            if (GameUtils.checkSolution(currentGameStats, code, currentRoundData)) {
+                currentGameStats.setCodeFound(true);
                 codeFound = true;
-                currentGame.setCodeFound(codeFound);
+                currentGameStats.setCodeFound(codeFound);
             } else {
                 System.out.println("Well placed pieces: " + currentRoundData.getWellPlaced());
                 System.out.println("Misplaced pieces: " + currentRoundData.getMisplaced());
-                currentGame.setRound(round++);
+                currentGameStats.setRound(round++);
             }
         } while (!codeFound && round < attempts);
 

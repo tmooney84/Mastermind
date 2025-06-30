@@ -8,13 +8,13 @@ import java.util.Set;
 public class GameUtils {
     //unique digits compose number
     public static boolean checkUniqueCode(String code) {
-        int numPieces = GameState.getNumPieces();
+        int numPieces = Config.getNumPieces();
         if (code.length() != numPieces) {
             return false;
         }
 
-        int low = GameState.getLowNum();
-        int high = GameState.getHighNum();
+        int low = Config.getLowNum();
+        int high = Config.getHighNum();
 
         Set<Character> seenDigits = new HashSet<>();
         int length = code.length();
@@ -35,9 +35,9 @@ public class GameUtils {
 
     public static String randomCode() {
         ArrayList<Integer> digits = new ArrayList<>();
-        int NUM_PIECES = GameState.getNumPieces();
-        int low = GameState.getLowNum();
-        int high = GameState.getHighNum();
+        int NUM_PIECES = Config.getNumPieces();
+        int low = Config.getLowNum();
+        int high = Config.getHighNum();
         for (int i = low; i <= high; i++) {
             digits.add(i);
         }
@@ -88,8 +88,8 @@ public class GameUtils {
 
 
     // TODO GameUtils.checkSolution() method
-    public static boolean checkSolution(GameState currentGame, String numString, RoundData data) {
-        String secretCode = currentGame.getSecretCode();
+    public static boolean checkSolution(GameStats currentGameStats, String numString, RoundData data) {
+        String secretCode = currentGameStats.getSecretCode();
         int sLength = secretCode.length();
 
         Set<Character> secretSet = new HashSet<>();
