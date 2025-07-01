@@ -1,11 +1,77 @@
 package org.mastermind;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class GameUtils {
+    //Single Player, Multiplayer???
+    public static int numPlayers() {
+        Scanner in = new Scanner(System.in);
+
+        boolean singlePlayerFlag = false;
+        boolean multiPlayerFlag = false;
+        do {
+            System.out.println("Enter 's' for single player, 'm' for multiplayer or 'c' to adjust configuration");
+            String input = in.nextLine();
+
+            if (input.equalsIgnoreCase("s")) {
+                singlePlayerFlag = true;
+            } else if (input.equalsIgnoreCase("m")) {
+                multiPlayerFlag = true;
+            } else if (input.equalsIgnoreCase("c")) {
+                Config.runConfig();
+            } else {
+                System.out.println("Incorrect input. Please enter 's' or 'm' to continue");
+            }
+        } while (!singlePlayerFlag && !multiPlayerFlag);
+
+        in.close();
+
+        if (singlePlayerFlag) {
+            return 1;
+        } else if (multiPlayerFlag) {
+            return 2;
+        } else {
+            System.out.println("Error determining number of players. Please try again.");
+        }
+
+        return -1;
+    }
+
+    public static String chooseCode() {
+        boolean codeChosen = false;
+        String secretCode = "";
+        do {
+            Scanner in = new Scanner(System.in);
+            System.out.println("Enter 'r' for random code or 'c' for custom code");
+            String input = in.nextLine();
+
+            if (input.equalsIgnoreCase("r")) {
+                codeChosen = true;
+                secretCode = GameUtils.randomCode();
+            } else if (input.equalsIgnoreCase("c")) {
+                codeChosen = true;
+                boolean validCode = false;
+                do {
+                    System.out.println("Please enter 4-digit code with unique values between "
+                            + Config.getLowNum() + " and " + Config.getHighNum() + " ie: 4537");
+                    secretCode = in.nextLine();
+                    if (GameUtils.checkUniqueCode(secretCode)) {
+                        System.out.println("Custom Secret Code Set.");
+                        validCode = true;
+                    } else {
+                        System.out.println("Invalid code. Please enter 4-digit code with unique values between 0 and 8. ie: 4537");
+                    }
+                } while (!validCode);
+
+            } else {
+                System.out.println("Incorrect input. Please enter 'r' for random code or 'c' for custom code");
+            }
+        } while (!codeChosen);
+
+        return secretCode;
+    }
+
+
     //unique digits compose number
     public static boolean checkUniqueCode(String code) {
         int numPieces = Config.getNumPieces();

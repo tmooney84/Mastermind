@@ -2,11 +2,9 @@ package org.mastermind;
 
 public class SinglePlayer implements GameState {
     private GameStats stats;
-    private Config config;
 
-    public SinglePlayer(Config config, GameStats stats) {
+    public SinglePlayer(GameStats stats) {
         this.stats = stats;
-        this.config = config;
     }
 
     @Override
