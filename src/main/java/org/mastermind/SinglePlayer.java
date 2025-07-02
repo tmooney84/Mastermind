@@ -16,6 +16,10 @@ public class SinglePlayer implements GameState {
         int totalRounds = stats.getAttempts();
 
         //Save rounds??? for db???
+
+        //TODO Could this a single method that could represent the round for a single player?
+        //could the roundsData object just be passed into the method??????????
+
         RoundData[] roundsData = new RoundData[totalRounds];
 
         int round = stats.getRound();

@@ -24,12 +24,19 @@ public class Main {
                 singlePlayer.gameRun();
             } else if (choice == 2) {
                 GameUtils.clearScreen();   //??? check performance
-
+                GameStats stats = new GameStats();
+                Multiplayer multiplayer = new Multiplayer(stats, in);
                 System.out.println("Enter: 1) Start Server \n2) Join Game...");
-                //enter 'leave' to disconnect
+                //if 1 - nameServer??? or have alias???
+                // multiplayer.startServer();
+
+                //if 2 - String otherServer >>>
                 System.out.println("Enter server name or address ['localhost' for demo']");
 
                 System.out.println("Enter player name: ");
+                //enter 'leave' to disconnect >>> may need to be in the do-while loop in function
+                //multiplayer.disconnect()
+
                 //TODO start up thread and implement Runnable in Multiplayer
                 //  >>> "Enter server name or address"
                 // Multiplayer game = new Multiplayer;
