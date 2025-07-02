@@ -4,13 +4,13 @@ import java.util.*;
 
 public class GameUtils {
     //Single Player, Multiplayer???
-    public static int numPlayers() {
-        Scanner in = new Scanner(System.in);
+    public static int chooseGamePlay(Scanner in) {
 
         boolean singlePlayerFlag = false;
         boolean multiPlayerFlag = false;
         do {
-            System.out.println("Enter 's' for single player, 'm' for multiplayer or 'c' to adjust configuration");
+            //clear screen
+            System.out.println("Enter: \n's' for single player,\n'm' for multiplayer \n'c' to adjust configuration \n'exit' to exit");
             String input = in.nextLine();
 
             if (input.equalsIgnoreCase("s")) {
@@ -19,12 +19,12 @@ public class GameUtils {
                 multiPlayerFlag = true;
             } else if (input.equalsIgnoreCase("c")) {
                 Config.runConfig();
+            } else if (input.equalsIgnoreCase("exit")) {
+                return 0;
             } else {
                 System.out.println("Incorrect input. Please enter 's' or 'm' to continue");
             }
         } while (!singlePlayerFlag && !multiPlayerFlag);
-
-        in.close();
 
         if (singlePlayerFlag) {
             return 1;
@@ -37,11 +37,27 @@ public class GameUtils {
         return -1;
     }
 
-    public static String chooseCode() {
+    public static void clearScreen() {
+        String os = System.getProperty("os.name").toLowerCase();
+        try {
+            if (os.contains("windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (Exception e) {
+            // Fallback: Print newlines if clear screen fails
+            for (int i = 0; i < 100; i++) {
+                System.out.println();
+            }
+        }
+    }
+
+    public static String chooseCode(Scanner in) {
         boolean codeChosen = false;
         String secretCode = "";
         do {
-            Scanner in = new Scanner(System.in);
             System.out.println("Enter 'r' for random code or 'c' for custom code");
             String input = in.nextLine();
 
@@ -71,6 +87,29 @@ public class GameUtils {
         return secretCode;
     }
 
+    public static void chooseNumAttempts(GameStats stats, Scanner in) {
+        boolean setAttemptsFlag = false;
+        do {
+            //???maybe describe with [10 Attempts] or different amount for multiplayer
+            System.out.println("Enter how many attempts the player is given or 'd' for default.");
+            String input = in.nextLine();
+            //********** is a in.nextLine(); needed?
+            if (input.equalsIgnoreCase("d")) {
+                setAttemptsFlag = true;
+            } else if (GameUtils.isValidNum(input)) {
+                int num = Integer.parseInt(input);
+                if (num <= Config.MAX_ATTEMPTS) {
+                    stats.setAttempts(num);
+                    setAttemptsFlag = true;
+
+                } else {
+                    System.out.println("Input exceeds maximum allowable attempts.");
+                }
+            } else {
+                System.out.println("Incorrect input.");
+            }
+        } while (!setAttemptsFlag);
+    }
 
     //unique digits compose number
     public static boolean checkUniqueCode(String code) {
@@ -151,7 +190,6 @@ public class GameUtils {
 //        }
 //        return true;
 //    }
-
 
     // TODO GameUtils.checkSolution() method
     public static boolean checkSolution(GameStats currentGameStats, String numString, RoundData data) {
