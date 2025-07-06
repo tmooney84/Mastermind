@@ -21,11 +21,11 @@ public class Main {
                 GameStats stats = new GameStats(code);
                 GameUtils.chooseNumAttempts(stats, in);
                 SinglePlayer singlePlayer = new SinglePlayer(stats, in);
-                singlePlayer.gameRun();
+                singlePlayer.gameRun(stats);
             } else if (choice == 2) {
                 GameUtils.clearScreen();   //??? check performance
                 GameStats stats = new GameStats();
-                Multiplayer multiplayer = new Multiplayer(stats, in);
+                //******temp highlight>>>>   Multiplayer multiplayer = new Multiplayer(stats, in);
                 System.out.println("Enter: 1) Start Server \n2) Join Game...");
                 //if 1 - nameServer??? or have alias???
                 // multiplayer.startServer();

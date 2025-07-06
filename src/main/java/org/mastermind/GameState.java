@@ -1,6 +1,6 @@
 package org.mastermind;
 
 interface GameState {
-    void gameRun();
+    void gameRun(GameState game);
 }
 
