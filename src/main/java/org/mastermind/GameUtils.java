@@ -87,17 +87,27 @@ public class GameUtils {
         return secretCode;
     }
 
-    public static void chooseNumAttempts(GameStats stats, Scanner in) {
+    public static void chooseNumAttempts(GameStats stats, Scanner in, boolean multi) {
         boolean setAttemptsFlag = false;
         do {
             //???maybe describe with [10 Attempts] or different amount for multiplayer
-            System.out.println("Enter how many attempts the player is given or 'd' for default.");
+            if (multi) {
+                System.out.println("Enter how many attempts each player is given or 'd' for default.");
+            } else {
+                System.out.println("Enter how many attempts the player is given or 'd' for default.");
+            }
             String input = in.nextLine();
             //********** is a in.nextLine(); needed?
             if (input.equalsIgnoreCase("d")) {
                 setAttemptsFlag = true;
             } else if (GameUtils.isValidNum(input)) {
                 int num = Integer.parseInt(input);
+
+                //double the amount of attempts for two players
+                if (multi) {
+                    num = num * 2;
+                }
+
                 if (num <= Config.MAX_ATTEMPTS) {
                     stats.setAttempts(num);
                     setAttemptsFlag = true;
@@ -170,28 +180,6 @@ public class GameUtils {
         return true;
     }
 
-//    //Validating that a code could potentially work
-//    public static boolean isValidPotCode(String strNum, int low, int high) {
-//        if (strNum == null || strNum.trim().isEmpty()) {
-//            return false;
-//        }
-//
-//        if (!checkUniqueNumbers(strNum)) {
-//            return false;
-//        }
-//
-//        int numLen = strNum.length();
-//
-//        for (int i = 0; i < numLen; i++) {
-//            char c = strNum.charAt(i);
-//            if (c < (char) (low + '0') || c > (char) (high + '0')) {
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
-
-    // TODO GameUtils.checkSolution() method
     public static boolean checkSolution(GameStats currentGameStats, String numString, RoundData data) {
         String secretCode = currentGameStats.getSecretCode();
         int sLength = secretCode.length();
@@ -227,6 +215,4 @@ public class GameUtils {
         }
         return matchedCode;
     }
-
-    // GameUtils.matchedPieces() method >>> use hashset again
 }

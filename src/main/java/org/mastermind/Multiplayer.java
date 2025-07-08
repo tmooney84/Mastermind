@@ -1,102 +1,130 @@
 package org.mastermind;
 
-//
-//import java.io.*;
-//import java.util.Scanner;
-//import java.net.ServerSocket;
-//import java.net.Socket;
-//import java.net.SocketException;
-//
+
+import java.io.*;
+import java.util.Scanner;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+
 public class Multiplayer {
-}
-//    private GameStats stats;
-//    private Config config;
-//    private Scanner in;
-//
-//    //private Field gameField???
-//    private int gamePort;
-//    private volatile boolean keepListening;
-//    private volatile boolean keepPlaying;
-//    private volatile boolean startNewGame;
-//    private volatile boolean disconnecting;
-//    private Server server;
-//    private Thread serverThread;
-//    private Thread clientThread;
-//
-//    //*****secret code needs to be randomized
-//    public Multiplayer(GameStats stats, Scanner in) {
-//        // this(stats, in, gamePort);
-/// /        this.stats = stats;
-/// /        this.in = in;
-//    }
-//
-//    public Multiplayer(GameStats stats, Scanner in, int port) {
-//        this.stats = stats;
-//        this.in = in;
-//        this.gamePort = port;
-//    }
-//
-//    public void startServer() {
-//        keepListening = true;
-//        keepPlaying = false;
-//        startNewGame = true;
-//        disconnecting = false;
-//        server = new Server();
-//        serverThread = new Thread(server);
-//        serverThread.start();
-//        //gameField.setScore(2, "waiting...")
-//    }
-//
-//    public void joinGame(String otherServer) {
-//        clientThread = new Thread(new Client(otherServer));
-//        clientThread.start();
-//    }
-//
-//    public void startGame() {
-//        startNewGame = true;
-//    }
-//
-//    public void disconnect() {
-//        disconnecting = true;
-//        keepListening = false;
-//
-//        if (server != null && keepPlaying == false) {
-//            server.stopListening();
-//        }
-//        keepPlaying = false;
-//    }
-//
-//    class Server implements Runnable {
-//        ServerSocket listener;
-//
-//        public void run() {
-//            Socket socket = null;
-//            try {
-//                listener = new ServerSocket(gamePort);
-//                while (keepListening) {
-//                    socket = listener.accept();
-//                    InputStream input = socket.getInputStream();
-//                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-//                    OutputStream output = socket.getOutputStream();
-//                    PrintWriter writer = new PrintWriter(output, true); //autoflush
-//
-//                    while (startNewGame) {
-//                        //*** creates a new game, but assumes this will be the last
-//                        writer.println("NEW_GAME");
-//                        startNewGame = false;
-//
-//                        //*** if client agrees, send over the location of the trees
-//                        String response = reader.readLine();
-//                        if (response != null && response.equals("OK")) {
-//                            gameField.setupNewGame();
-//                            //loop through writing tree positions
-//                        } else {
-//                            System.err.println("Unxpected start response: " + response);
-//                            System.err.println("Skipping game and waiting again.");
-//                            keepPlaying = false;
-//                            break;
-//                        }
-//
+    private GameStats game;
+    private Scanner in;
+
+    //private Field gameField???
+    private int gamePort;
+    private volatile boolean keepListening;
+    private volatile boolean keepPlaying;
+    private volatile boolean startNewGame;
+    private volatile boolean disconnecting;
+    private Server server;
+    private Thread serverThread;
+    private Thread clientThread;
+
+
+    public Multiplayer(GameStats game, Scanner in) {
+        this.game = game;
+        this.in = in;
+    }
+
+    public Multiplayer(GameStats game, Scanner in, int port) {
+        this.game = game;
+        this.in = in;
+        this.gamePort = port;
+    }
+
+    public void startServer(String serverName) {
+        keepListening = true;
+        keepPlaying = false;
+        startNewGame = true;
+        disconnecting = false;
+        server = new Server();
+        serverThread = new Thread(server);
+        serverThread.start();
+
+        server.serverName = serverName;
+        //gameField.setScore(2, "waiting...")
+
+        //??? do I need to create a score??? could be inversely proportional to the
+        //number of attempts?
+    }
+
+    public void joinGame(String otherServer) {
+        clientThread = new Thread(new Client(otherServer));
+        clientThread.start();
+    }
+
+    public void startGame() {
+        startNewGame = true;
+    }
+
+    public void disconnect() {
+        disconnecting = true;
+        keepListening = false;
+
+        if (server != null && keepPlaying == false) {
+            server.stopListening();
+        }
+        keepPlaying = false;
+    }
+
+    class Server implements Runnable {
+        ServerSocket listener;
+        private String serverName;
+
+        public void run() {
+            Socket socket = null;
+            try {
+                listener = new ServerSocket(gamePort);
+                while (keepListening) {
+                    socket = listener.accept();
+                    InputStream input = socket.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                    OutputStream output = socket.getOutputStream();
+                    PrintWriter writer = new PrintWriter(output, true); //autoflush
+
+                  /*
+                 //***may be a good idea to send username with the play game???
+                  So the three outcomes are "YOU WIN" "YOU LOSE" and "TIE"
+                  -at the beginning of the game, the client should start with
+                   "WAITING FOR OPPONENT'S GUESS", once the server player has
+                   gone, then the game should be run
+
+                  -after each attempt the RoundData should be sent over the
+                  wire and added to the local client game. It needs to say
+                  something like "WAITING FOR OPPONENT'S GUESS" when waiting for the
+                  response
+
+
+
+                   */
+
+
+
+                    while (startNewGame) {
+                       //need to reset CLIENT_NAME if necessary if new CLIENT JOINS??? depends
+                       //on the "OK" if it is every time
+
+                        //!!!!!!!!!!!!!!!!!!!!!!!!! pass "NEW_GAME SERVER_USERNAME"
+                        //and same for the Client username as well
+                        //*** creates a new game, but assumes this will be the last
+                        writer.println("NEW_GAME " + serverName);
+                        startNewGame = false;
+
+                        //*** if client agrees, send over the location of the trees
+                        //"OK CLIENT_NAME"
+                        String response = reader.readLine();
+                        String[] resParts = response.split(" ");
+                        if (response != null && resParts[0].equals("OK")) {
+                            gameField.setupNewGame();
+                            //loop through writing tree positions
+                        } else {
+                            System.err.println("Unexpected start response: " + response);
+                            System.err.println("Skipping game and waiting again.");
+                            keepPlaying = false;
+                            break;
+                        }
+
 //                        //Start the action!
 //                        writer.println("START");
 //                        response = reader.readLine();
@@ -229,3 +257,132 @@ public class Multiplayer {
 //        RoundData[] roundsData = new RoundData[stats.getAttempts()];
 //    }
 //}
+
+
+
+
+
+
+
+/*
+    class Client implements Runnable {
+        String gameHost;
+        boolean startNewGame;
+
+        public Client(String host) {
+            gameHost = host;
+            keepPlaying = false;
+            startNewGame = false;
+        }
+
+        public void run() {
+            try (Socket socket = new Socket(gameHost, gamePort)) {
+
+                InputStream in = socket.getInputStream();
+                BufferedReader reader = new BufferedReader( new InputStreamReader( in ) );
+                OutputStream out = socket.getOutputStream();
+                PrintWriter writer = new PrintWriter( out, true );
+
+                // Assume the first game will start...
+                startNewGame = true;
+                while (startNewGame) {
+                    // ... but only the first
+                    startNewGame = false;
+
+                    // We expect to see the NEW_GAME command first
+                    String response = reader.readLine();
+
+                    // If we don't see that command, bail
+                    if (response == null || !response.equals("NEW_GAME")) {
+                        System.err.println("Unexpected initial command: " + response);
+                        System.err.println("Disconnecting");
+                        writer.println("DISCONNECT");
+                        return;
+                    }
+                    // Yay! We're going to play a game. Acknowledge this command
+                    writer.println("OK");
+                    // And now gather the trees and setup our field
+                    gameField.trees.clear();
+                    response = reader.readLine();
+                    while (response.startsWith("TREE")) {
+                        String[] parts = response.split(" ");
+                        int x = Integer.parseInt(parts[1]);
+                        int y = Integer.parseInt(parts[2]);
+                        Tree tree = new Tree();
+                        tree.setPosition(x, y);
+                        gameField.trees.add(tree);
+                        response = reader.readLine();
+                    }
+                    if (!response.equals("START")) {
+                        // Hmm, we should have ended the list of trees with a START, but didn't. Bail out.
+                        System.err.println("Unexpected start to the game: " + response);
+                        System.err.println("Disconnecting");
+                        writer.println("DISCONNECT");
+                        return;
+                    } else {
+                        // Yay again! We're starting a game. Acknowledge this command
+                        writer.println("OK");
+                        keepPlaying = true;
+                        gameField.repaint();
+                    }
+                    while (keepPlaying) {
+                        response = reader.readLine();
+                        System.out.println("DEBUG: --" + response + "--");
+                        String[] parts = response.split(" ");
+                        switch (parts[0]) {
+                            case "END":
+                                keepPlaying = false;
+                            case "SCORE":
+                                gameField.setScore(2, parts[1]);
+                                break;
+                            case "DISCONNECT":
+                                disconnecting = true;
+                                keepPlaying = false;
+                                break;
+                            default:
+                                System.err.println("Unexpected game command: " + response + ". Ignoring.");
+                        }
+                        if (disconnecting) {
+                            // We're disconnecting or they are. Acknowledge and quit.
+                            writer.println("DISCONNECT");
+                            return;
+                        } else {
+                            // If we're not disconnecting, reply with our current score
+                            if (gameField.trees.size() > 0) {
+                                writer.print("SCORE ");
+                            } else {
+                                keepPlaying = false;
+                                writer.print("END ");
+                            }
+                            writer.println(gameField.getScore(1));
+                        }
+                    }
+                    if (!disconnecting) {
+                        // Check to see if they want to play again
+                        response = reader.readLine();
+                        if (response != null && response.equals("PLAY_AGAIN")) {
+                            // Do we want to play again?
+                            String message = gameField.getWinner() + " Would you like to play again?";
+                            int myPlayAgain = JOptionPane.showConfirmDialog(gameField, message, "Play Again?", JOptionPane.YES_NO_OPTION);
+                            if (myPlayAgain == JOptionPane.YES_OPTION) {
+                                writer.println("YES");
+                                startNewGame = true;
+                            } else {
+                                // Not playing again so disconnect.
+                                disconnecting = true;
+                                writer.println("DISCONNECT");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IOException e ) {
+                System.err.println("Networking error. Closing down client.");
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+
+ */

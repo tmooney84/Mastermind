@@ -10,12 +10,14 @@ public class GameStats {
     private int currentRound;
     private boolean codeFound;
     private RoundData[] roundsData;
+    private int points;
 
     public GameStats() {
         this.currentRound = 0;
         this.secretCode = randomCode();
         this.codeFound = false;
         this.roundsData = new RoundData[attempts];
+        this.points = 0;
     }
 
     public GameStats(String secretCode) {
@@ -23,6 +25,7 @@ public class GameStats {
         this.secretCode = secretCode;
         this.codeFound = false;
         this.roundsData = new RoundData[attempts];
+        this.points = 0;
     }
 
     public void setRoundData(RoundData currentData, int round) {
@@ -44,6 +47,11 @@ public class GameStats {
     public void setCodeFound(boolean codeFound) {
         this.codeFound = codeFound;
     }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
 
     public String getSecretCode() {
         return secretCode;
@@ -67,6 +75,10 @@ public class GameStats {
 
     public RoundData getRoundData(int roundNumber) {
         return roundsData[roundNumber];
+    }
+
+    public int getPoints() {
+        return points;
     }
 
     public void runRound(Scanner in) {

@@ -19,27 +19,46 @@ public class Main {
                 GameUtils.clearScreen();   //??? check performance
                 String code = GameUtils.chooseCode(in);
                 GameStats stats = new GameStats(code);
-                GameUtils.chooseNumAttempts(stats, in);
+                GameUtils.chooseNumAttempts(stats, in, false);
                 SinglePlayer singlePlayer = new SinglePlayer(stats, in);
                 singlePlayer.gameRun(stats);
             } else if (choice == 2) {
                 GameUtils.clearScreen();   //??? check performance
-                GameStats stats = new GameStats();
-                //******temp highlight>>>>   Multiplayer multiplayer = new Multiplayer(stats, in);
-                System.out.println("Enter: 1) Start Server \n2) Join Game...");
-                //if 1 - nameServer??? or have alias???
-                // multiplayer.startServer();
+                GameStats game = new GameStats();
+                GameUtils.chooseNumAttempts(game, in, true);
+                Multiplayer multiplayer = new Multiplayer(game, in);
 
-                //if 2 - String otherServer >>>
-                System.out.println("Enter server name or address ['localhost' for demo']");
+                //multiplayer.prompt();
+                boolean optionChosen = false;
+                do {
+                    System.out.println("Enter: 1) Start Server \n2) Join Game...");
+                    int option = in.nextInt();
+                    in.nextLine();
 
-                System.out.println("Enter player name: ");
-                //enter 'leave' to disconnect >>> may need to be in the do-while loop in function
-                //multiplayer.disconnect()
+                    if (option == 1) {
+                        System.out.println("Enter Server Name: ");
+                        String serverName = in.nextLine();
+                        multiplayer.startServer(serverName);
+                        optionChosen = true;
+                    }
 
-                //TODO start up thread and implement Runnable in Multiplayer
-                //  >>> "Enter server name or address"
-                // Multiplayer game = new Multiplayer;
+                    //if 2 - String otherServer >>>
+                    else if (option == 2) {
+                        System.out.println("Enter server name or address ['localhost' for demo']: ");
+                        String serverName = in.nextLine();
+
+                        System.out.println("Enter Client Name: ");
+                        String clientName = in.nextLine();
+
+                    }
+                    //enter 'leave' to disconnect >>> may need to be in the do-while loop in function
+                    //multiplayer.disconnect()
+
+                    //TODO start up thread and implement Runnable in Multiplayer
+                    //  >>> "Enter server name or address"
+                    // Multiplayer game = new Multiplayer;
+                } while (!optionChosen);
+
             } else if (choice == -1) {
                 System.out.println("Error determining game play.");
             }
