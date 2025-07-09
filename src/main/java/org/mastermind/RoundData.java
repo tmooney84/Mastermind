@@ -9,6 +9,11 @@ public class RoundData {
         misplaced = 0;
     }
 
+    RoundData(Integer wellPlaced, Integer misplaced) {
+        this.wellPlaced = wellPlaced;
+        this.misplaced = misplaced;
+    }
+
     public void setWellPlaced(Integer wellPlaced) {
         this.wellPlaced = wellPlaced;
     }

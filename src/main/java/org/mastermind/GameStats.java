@@ -115,9 +115,17 @@ public class GameStats {
             //RoundData currentRound = new RoundData();
 
             this.setRoundData(currentRoundData, currentRound);
-
-            this.setCurrentRound(currentRound + 1);
         }
+    }
+
+    public void setRoundStats(String num1, String num2) {
+        int wellPlaced = Integer.parseInt(num1);
+        int misplaced = Integer.parseInt(num2);
+
+        RoundData current = new RoundData(wellPlaced, misplaced);
+        int currentRound = this.getCurrentRound();
+        this.setRoundData(current, currentRound);
+        return;
     }
 }
 

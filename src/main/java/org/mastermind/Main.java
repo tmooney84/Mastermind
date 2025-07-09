@@ -45,11 +45,12 @@ public class Main {
                     //if 2 - String otherServer >>>
                     else if (option == 2) {
                         System.out.println("Enter server name or address ['localhost' for demo']: ");
-                        String serverName = in.nextLine();
+                        String hostName = in.nextLine();
 
                         System.out.println("Enter Client Name: ");
                         String clientName = in.nextLine();
 
+                        multiplayer.joinGame(hostName);
                     }
                     //enter 'leave' to disconnect >>> may need to be in the do-while loop in function
                     //multiplayer.disconnect()
@@ -58,6 +59,8 @@ public class Main {
                     //  >>> "Enter server name or address"
                     // Multiplayer game = new Multiplayer;
                 } while (!optionChosen);
+            } else if (choice == 3) {
+                Config.runConfig();
 
             } else if (choice == -1) {
                 System.out.println("Error determining game play.");

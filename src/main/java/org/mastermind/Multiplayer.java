@@ -9,7 +9,7 @@ import java.net.SocketException;
 
 public class Multiplayer {
     private GameStats game;
-    private Scanner in;
+    private static Scanner in;
 
     //private Field gameField???
     private int gamePort;
@@ -42,7 +42,7 @@ public class Multiplayer {
         serverThread = new Thread(server);
         serverThread.start();
 
-        server.serverName = serverName;
+        server.setServerName(serverName);
         //gameField.setScore(2, "waiting...")
 
         //??? do I need to create a score??? could be inversely proportional to the
@@ -71,6 +71,22 @@ public class Multiplayer {
     class Server implements Runnable {
         ServerSocket listener;
         private String serverName;
+        private String clientName;
+
+        public void setServerName(String serverName){
+            this.serverName = serverName;
+        }
+        public void setClientName(String clientName){
+            this.clientName = clientName;
+        }
+
+        public String getServerName(){
+            return serverName;
+        }
+
+        public String getClientName(){
+            return clientName;
+        }
 
         public void run() {
             Socket socket = null;
@@ -108,15 +124,18 @@ public class Multiplayer {
                         //!!!!!!!!!!!!!!!!!!!!!!!!! pass "NEW_GAME SERVER_USERNAME"
                         //and same for the Client username as well
                         //*** creates a new game, but assumes this will be the last
-                        writer.println("NEW_GAME " + serverName);
+                        writer.println("NEW_GAME");
                         startNewGame = false;
 
                         //*** if client agrees, send over the location of the trees
                         //"OK CLIENT_NAME"
                         String response = reader.readLine();
                         String[] resParts = response.split(" ");
-                        if (response != null && resParts[0].equals("OK")) {
-                            gameField.setupNewGame();
+                        if (resParts != null && resParts[0].equals("OK") && resParts[1] != null) {
+                            //gameField.setupNewGame(); //!!!!!!!!!!!!!!!!!!!!!!!!
+
+                            setClientName(resParts[1]);
+
                             //loop through writing tree positions
                         } else {
                             System.err.println("Unexpected start response: " + response);
@@ -125,11 +144,11 @@ public class Multiplayer {
                             break;
                         }
 
-//                        //Start the action!
-//                        writer.println("START");
-//                        response = reader.readLine();
-//                        keepPlaying = response.equals("OK");
-//
+                        //Start the action!
+                        writer.println("START" + game.getSecretCode());
+                        response = reader.readLine();
+                        keepPlaying = response.equals("OK");
+
 //                        while (keepPlaying) {
 //                            try {
 //                                if (gameField.trees.size() > 0) {
@@ -238,6 +257,7 @@ public class Multiplayer {
 //                } catch (IOException ioe){
 //                    System.err.println("Error disconnecting listener: " + ioe.getMessage());
 //                }
+
 //            }
 //        }
 //    }
@@ -264,15 +284,31 @@ public class Multiplayer {
 
 
 
-/*
     class Client implements Runnable {
         String gameHost;
+        String username;
         boolean startNewGame;
 
         public Client(String host) {
             gameHost = host;
             keepPlaying = false;
             startNewGame = false;
+        }
+
+        public void setGameHost(String gameHost){
+            this.gameHost = gameHost;
+        }
+
+        public void setUsername(String username){
+            this.username = username;
+        }
+
+        public String getGameHost(){
+            return gameHost;
+        }
+
+        public String getUsername(){
+            return username;
         }
 
         public void run() {
@@ -291,18 +327,18 @@ public class Multiplayer {
 
                     // We expect to see the NEW_GAME command first
                     String response = reader.readLine();
-
                     // If we don't see that command, bail
-                    if (response == null || !response.equals("NEW_GAME")) {
+                    if(response == null || !response.equals("NEW_GAME")){
                         System.err.println("Unexpected initial command: " + response);
                         System.err.println("Disconnecting");
                         writer.println("DISCONNECT");
                         return;
                     }
+
                     // Yay! We're going to play a game. Acknowledge this command
-                    writer.println("OK");
+                    writer.println("OK " + username);
                     // And now gather the trees and setup our field
-                    gameField.trees.clear();
+                    //gameField.trees.clear(); !!!!!!
                     response = reader.readLine();
                     while (response.startsWith("TREE")) {
                         String[] parts = response.split(" ");
@@ -313,13 +349,16 @@ public class Multiplayer {
                         gameField.trees.add(tree);
                         response = reader.readLine();
                     }
-                    if (!response.equals("START")) {
+
+                    String[] resParts = response.split(" ");
+                    if (!resParts[0].equals("START") || resParts[1] == null) {
                         // Hmm, we should have ended the list of trees with a START, but didn't. Bail out.
                         System.err.println("Unexpected start to the game: " + response);
                         System.err.println("Disconnecting");
                         writer.println("DISCONNECT");
                         return;
                     } else {
+                        game.setSecretCode(resParts[1]);
                         // Yay again! We're starting a game. Acknowledge this command
                         writer.println("OK");
                         keepPlaying = true;
@@ -329,11 +368,63 @@ public class Multiplayer {
                         response = reader.readLine();
                         System.out.println("DEBUG: --" + response + "--");
                         String[] parts = response.split(" ");
+                        int round = Integer.parseInt(parts[1]);
+//                        switch (parts[0]) {
+//                            case "END":
+//                                keepplaying = false;
+//                            case "SCORE":
+//                                gamefield.setscore(2, parts[1]);
+//                                break;
+//                            case "DISCONNECT":
+//                                disconnecting = true;
+//                                keepplaying = false;
+//                                break;
+//                            default:
+//                                system.err.println("unexpected game command: " + response + ". ignoring.");
+//                        }
+
+                        // "CODE_FOUND 4 0" "NO_CODE 2 2" "DISCONNECT"
+//TODO           "CODE_FOUND *round_num* 4 0" "NO_CODE round_num 2 2" "DISCONNECT"
                         switch (parts[0]) {
-                            case "END":
+                            case "CODE_FOUND":
+                                if(!GameUtils.isValidNum(parts[1]) || !GameUtils.isValidNum(parts[2]) || !GameUtils.isValidNum(parts[3]))
+                                {
+                                    System.err.println("Unexpected game command: " + response + ". Ignoring.");
+                                    break;
+                                }
+
+                                game.setRoundStats(parts[2], parts[3]);
+
+                                //!!! add to roundsData ... no need to increment because done
+//                                currentRound++;
+//                                game.setCurrentRound(currentRound);
+//
                                 keepPlaying = false;
-                            case "SCORE":
-                                gameField.setScore(2, parts[1]);
+
+                                System.out.println("---");
+                                System.out.println("Round " + round/2);
+                                System.out.println("The secret code was: " + game.getSecretCode());
+                                System.out.println(gameHost + " wins the game in Round " + game.getCurrentRound()/2 + "!");
+                                break;
+                            case "NO_CODE":
+                                if(!GameUtils.isValidNum(parts[1]) || !GameUtils.isValidNum(parts[2]) || !GameUtils.isValidNum(parts[3]))
+                                {
+                                    System.err.println("Unexpected game command: " + response + ". Ignoring.");
+                                    break;
+                                }
+
+                                game.setRoundStats(parts[2], parts[3]);
+
+                                System.out.println("---");
+                                System.out.println("Round " + round/2 + " -- " + gameHost);
+                                System.out.println("Well placed pieces: " + parts[1]);
+                                System.out.println("Misplaced pieces: " + parts[2]);
+
+
+                                //!!! add to roundsData ... no need to increment because done
+                                game.setCurrentRound(round + 1);
+
+                                //gameField.setScore(2, parts[1]);
                                 break;
                             case "DISCONNECT":
                                 disconnecting = true;
@@ -342,21 +433,81 @@ public class Multiplayer {
                             default:
                                 System.err.println("Unexpected game command: " + response + ". Ignoring.");
                         }
+
+
+
                         if (disconnecting) {
                             // We're disconnecting or they are. Acknowledge and quit.
                             writer.println("DISCONNECT");
                             return;
-                        } else {
-                            // If we're not disconnecting, reply with our current score
-                            if (gameField.trees.size() > 0) {
-                                writer.print("SCORE ");
-                            } else {
-                                keepPlaying = false;
-                                writer.print("END ");
-                            }
-                            writer.println(gameField.getScore(1));
                         }
+//                        else {
+//                            // If we're not disconnecting, reply with our current score
+//                            if (gameField.trees.size() > 0) {
+//                                writer.print("SCORE ");
+//                            } else {
+//                                keepPlaying = false;
+//                                writer.print("END ");
+//                            }
+//                            writer.println(gameField.getScore(1));
+//                        }
+//                    }
+
+
+                    else {
+                        // If we're not disconnecting, reply with our current score
+                            game.runRound(Multiplayer.in);
+
+//TODO           "CODE_FOUND *Round_num* 4 0" "NO_CODE 2 2" "DISCONNECT"
+                            boolean codeFound = game.getCodeFound();
+                            int currentRound = game.getCurrentRound();
+                            RoundData current = game.getRoundData(currentRound);
+
+                            int wellPlaced = current.getWellPlaced();
+                            int misplaced = current.getMisplaced();
+
+                            if(!codeFound){
+                                 writer.print("NO_CODE " + currentRound + " " + wellPlaced + " " + misplaced);
+                                //increments to next round
+                                 //???game.setCurrentRound(game.getCurrentRound() + 1);
+                            }else{
+                                keepPlaying = false;
+                                writer.print("CODE_FOUND " + currentRound + " " + wellPlaced + " " + misplaced);
+                            }
+
+
+
+                           //
+                            if (gameField.trees.size() > 0) {
+                            writer.print("SCORE ");
+                        } else {
+                            keepPlaying = false;
+                            writer.print("END ");
+                        }
+                        writer.println(gameField.getScore(1));
                     }
+                }
+
+//*****************************************************************************//
+//           "CODE_FOUND 4 0" "NO_CODE 2 2" "DISCONNECT"
+//                    switch (parts[0]) {
+//                            case "END":
+//                                keepplaying = false;
+//                            case "SCORE":
+//                                gamefield.setscore(2, parts[1]);
+//                                break;
+//                            case "DISCONNECT":
+//                                disconnecting = true;
+//                                keepplaying = false;
+//                                break;
+//                            default:
+//                                system.err.println("unexpected game command: " + response + ". ignoring.");
+//                        }
+
+//*****************************************************************************//
+
+
+
                     if (!disconnecting) {
                         // Check to see if they want to play again
                         response = reader.readLine();

@@ -25,6 +25,7 @@ public class SinglePlayer {
 
         do {
             game.runRound(in);
+            game.setCurrentRound(game.getCurrentRound() + 1);
             codeFound = game.getCodeFound();
             round = game.getCurrentRound();
         } while (!codeFound && round < attempts);

@@ -18,11 +18,11 @@ public class GameUtils {
             } else if (input.equalsIgnoreCase("m")) {
                 multiPlayerFlag = true;
             } else if (input.equalsIgnoreCase("c")) {
-                Config.runConfig();
+                return 3;
             } else if (input.equalsIgnoreCase("exit")) {
                 return 0;
             } else {
-                System.out.println("Incorrect input. Please enter 's' or 'm' to continue");
+                System.out.println("Incorrect input. Please enter 's', 'm' or 'c' to continue");
             }
         } while (!singlePlayerFlag && !multiPlayerFlag);
 
