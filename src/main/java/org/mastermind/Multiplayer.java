@@ -17,6 +17,7 @@ public class Multiplayer {
     private volatile boolean keepPlaying;
     private volatile boolean startNewGame;
     private volatile boolean disconnecting;
+    private volatile boolean winner;
     private Server server;
     private Thread serverThread;
     private Thread clientThread;
@@ -33,11 +34,20 @@ public class Multiplayer {
         this.gamePort = port;
     }
 
+    public void setWinner(boolean winner)
+    {
+        this.winner = winner;
+    }
+    public boolean getWinner(){
+        return winner;
+    }
+
     public void startServer(String serverName) {
         keepListening = true;
         keepPlaying = false;
         startNewGame = true;
         disconnecting = false;
+        winner = true;           //Server gets first guess by default
         server = new Server();
         serverThread = new Thread(server);
         serverThread.start();
@@ -83,9 +93,30 @@ public class Multiplayer {
         public String getServerName(){
             return serverName;
         }
-
         public String getClientName(){
             return clientName;
+        }
+
+        public void sendRunRound(GameStats game, PrintWriter writer){
+            // If we're not disconnecting, reply with our current score
+            game.runRound(Multiplayer.in);
+
+            //"CODE_FOUND *Round_num* 4 0" "NO_CODE 2 2" "DISCONNECT"
+            boolean codeFound = game.getCodeFound();
+            int currentRound = game.getCurrentRound();
+            RoundData current = game.getRoundData(currentRound);
+
+            int wellPlaced = current.getWellPlaced();
+            int misplaced = current.getMisplaced();
+
+            if(!codeFound){
+                writer.println("NO_CODE " + currentRound + " " + wellPlaced + " " + misplaced);
+                //increments to next round
+                //???game.setCurrentRound(game.getCurrentRound() + 1);
+            }else{
+                keepPlaying = false;
+                writer.println("CODE_FOUND " + currentRound + " " + wellPlaced + " " + misplaced);
+            }
         }
 
         public void run() {
@@ -93,6 +124,7 @@ public class Multiplayer {
             try {
                 listener = new ServerSocket(gamePort);
                 while (keepListening) {
+                    System.out.println("Waiting for opponent to join...");
                     socket = listener.accept();
                     InputStream input = socket.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(input));
@@ -118,8 +150,8 @@ public class Multiplayer {
 
 
                     while (startNewGame) {
-                       //need to reset CLIENT_NAME if necessary if new CLIENT JOINS??? depends
-                       //on the "OK" if it is every time
+                        //need to reset CLIENT_NAME if necessary if new CLIENT JOINS??? depends
+                        //on the "OK" if it is every time
 
                         //!!!!!!!!!!!!!!!!!!!!!!!!! pass "NEW_GAME SERVER_USERNAME"
                         //and same for the Client username as well
@@ -152,7 +184,7 @@ public class Multiplayer {
 //                        while (keepPlaying) {
 //                            try {
 //                                if (gameField.trees.size() > 0) {
-//                                    writer.print("SCORE");
+//                                    writer.println("SCORE");
 //                                } else {
 //                                    write.print("END ");
 //                                    keepPlaying = false;
@@ -282,8 +314,6 @@ public class Multiplayer {
 
 
 
-
-
     class Client implements Runnable {
         String gameHost;
         String username;
@@ -293,6 +323,7 @@ public class Multiplayer {
             gameHost = host;
             keepPlaying = false;
             startNewGame = false;
+            winner = false;
         }
 
         public void setGameHost(String gameHost){
@@ -340,15 +371,6 @@ public class Multiplayer {
                     // And now gather the trees and setup our field
                     //gameField.trees.clear(); !!!!!!
                     response = reader.readLine();
-                    while (response.startsWith("TREE")) {
-                        String[] parts = response.split(" ");
-                        int x = Integer.parseInt(parts[1]);
-                        int y = Integer.parseInt(parts[2]);
-                        Tree tree = new Tree();
-                        tree.setPosition(x, y);
-                        gameField.trees.add(tree);
-                        response = reader.readLine();
-                    }
 
                     String[] resParts = response.split(" ");
                     if (!resParts[0].equals("START") || resParts[1] == null) {
@@ -362,28 +384,19 @@ public class Multiplayer {
                         // Yay again! We're starting a game. Acknowledge this command
                         writer.println("OK");
                         keepPlaying = true;
-                        gameField.repaint();
+                        //gameField.repaint();
                     }
                     while (keepPlaying) {
+                        //if Round 0, winner should go first or server...
+                        if(winner && game.getCurrentRound() == 0){
+                            sendRunRound(game, writer);
+                        }
+
                         response = reader.readLine();
                         System.out.println("DEBUG: --" + response + "--");
                         String[] parts = response.split(" ");
                         int round = Integer.parseInt(parts[1]);
-//                        switch (parts[0]) {
-//                            case "END":
-//                                keepplaying = false;
-//                            case "SCORE":
-//                                gamefield.setscore(2, parts[1]);
-//                                break;
-//                            case "DISCONNECT":
-//                                disconnecting = true;
-//                                keepplaying = false;
-//                                break;
-//                            default:
-//                                system.err.println("unexpected game command: " + response + ". ignoring.");
-//                        }
 
-                        // "CODE_FOUND 4 0" "NO_CODE 2 2" "DISCONNECT"
 //TODO           "CODE_FOUND *round_num* 4 0" "NO_CODE round_num 2 2" "DISCONNECT"
                         switch (parts[0]) {
                             case "CODE_FOUND":
@@ -393,13 +406,9 @@ public class Multiplayer {
                                     break;
                                 }
 
-                                game.setRoundStats(parts[2], parts[3]);
-
-                                //!!! add to roundsData ... no need to increment because done
-//                                currentRound++;
-//                                game.setCurrentRound(currentRound);
-//
+                                game.setRoundStats(parts[2], parts[3], round);
                                 keepPlaying = false;
+                                winner = false;
 
                                 System.out.println("---");
                                 System.out.println("Round " + round/2);
@@ -413,7 +422,7 @@ public class Multiplayer {
                                     break;
                                 }
 
-                                game.setRoundStats(parts[2], parts[3]);
+                                game.setRoundStats(parts[2], parts[3], round);
 
                                 System.out.println("---");
                                 System.out.println("Round " + round/2 + " -- " + gameHost);
@@ -441,81 +450,21 @@ public class Multiplayer {
                             writer.println("DISCONNECT");
                             return;
                         }
-//                        else {
-//                            // If we're not disconnecting, reply with our current score
-//                            if (gameField.trees.size() > 0) {
-//                                writer.print("SCORE ");
-//                            } else {
-//                                keepPlaying = false;
-//                                writer.print("END ");
-//                            }
-//                            writer.println(gameField.getScore(1));
-//                        }
-//                    }
-
-
-                    else {
-                        // If we're not disconnecting, reply with our current score
-                            game.runRound(Multiplayer.in);
-
-//TODO           "CODE_FOUND *Round_num* 4 0" "NO_CODE 2 2" "DISCONNECT"
-                            boolean codeFound = game.getCodeFound();
-                            int currentRound = game.getCurrentRound();
-                            RoundData current = game.getRoundData(currentRound);
-
-                            int wellPlaced = current.getWellPlaced();
-                            int misplaced = current.getMisplaced();
-
-                            if(!codeFound){
-                                 writer.print("NO_CODE " + currentRound + " " + wellPlaced + " " + misplaced);
-                                //increments to next round
-                                 //???game.setCurrentRound(game.getCurrentRound() + 1);
-                            }else{
-                                keepPlaying = false;
-                                writer.print("CODE_FOUND " + currentRound + " " + wellPlaced + " " + misplaced);
-                            }
-
-
-
-                           //
-                            if (gameField.trees.size() > 0) {
-                            writer.print("SCORE ");
-                        } else {
-                            keepPlaying = false;
-                            writer.print("END ");
-                        }
-                        writer.println(gameField.getScore(1));
+                        else {
+                            sendRunRound(game, writer);
                     }
                 }
-
-//*****************************************************************************//
-//           "CODE_FOUND 4 0" "NO_CODE 2 2" "DISCONNECT"
-//                    switch (parts[0]) {
-//                            case "END":
-//                                keepplaying = false;
-//                            case "SCORE":
-//                                gamefield.setscore(2, parts[1]);
-//                                break;
-//                            case "DISCONNECT":
-//                                disconnecting = true;
-//                                keepplaying = false;
-//                                break;
-//                            default:
-//                                system.err.println("unexpected game command: " + response + ". ignoring.");
-//                        }
-
-//*****************************************************************************//
-
-
 
                     if (!disconnecting) {
                         // Check to see if they want to play again
                         response = reader.readLine();
                         if (response != null && response.equals("PLAY_AGAIN")) {
                             // Do we want to play again?
-                            String message = gameField.getWinner() + " Would you like to play again?";
-                            int myPlayAgain = JOptionPane.showConfirmDialog(gameField, message, "Play Again?", JOptionPane.YES_NO_OPTION);
-                            if (myPlayAgain == JOptionPane.YES_OPTION) {
+                            String winMessage = winner ? "You Win!" : "You Lose.";
+                            System.out.println(winMessage + " Would you like to play again? Y/n");
+                            /// ////////////////////////////////////////////////////////////////////////
+                            String playAgain = in.nextLine();
+                            if (playAgain.equalsIgnoreCase("y")) {
                                 writer.println("YES");
                                 startNewGame = true;
                             } else {
@@ -534,6 +483,3 @@ public class Multiplayer {
         }
     }
 }
-
-
- */
