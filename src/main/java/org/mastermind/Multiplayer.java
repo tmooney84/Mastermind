@@ -179,7 +179,7 @@ public class Multiplayer {
                         }
 
                         //Start the action!
-                        writer.println("START" + game.getSecretCode());
+                        writer.println("START " + game.getSecretCode());
                         response = reader.readLine();
                         keepPlaying = response.equals("OK");
 
@@ -242,7 +242,7 @@ public class Multiplayer {
                                             System.out.println("Misplaced pieces: " + parts[2]);
 
                                             if (round == game.getAttempts() - 1) {
-                                                System.out.println("Game Over...Tie");
+                                                System.out.println("Game Over...You Tied with " + clientName);
                                                 //***Persist to SQLITE database!!!***********//
                                                 break;
                                             }
@@ -446,7 +446,7 @@ public class Multiplayer {
                                 System.out.println("Misplaced pieces: " + parts[2]);
 
                                 if (round == game.getAttempts() - 1) {
-                                    System.out.println("Game Over...Tie");
+                                    System.out.println("Game Over...You Tied with " + gameHost);
                                     break;
                                 }
                                 game.setCurrentRound(round + 1);
