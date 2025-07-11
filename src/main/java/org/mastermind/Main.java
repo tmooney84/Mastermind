@@ -10,8 +10,6 @@ public class Main {
             GameUtils.clearScreen();
             System.out.println("Welcome to Mastermind!");
             System.out.println();
-
-
             int choice = GameUtils.chooseGamePlay(in);
             if (choice == 0) {
                 break;
@@ -38,8 +36,13 @@ public class Main {
                     if (option == 1) {
                         System.out.println("Enter Server Name: ");
                         String serverName = in.nextLine();
-                        multiplayer.startServer(serverName);
+                        Thread serverThread = multiplayer.startServer(serverName);
                         optionChosen = true;
+                        try {
+                            serverThread.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     //if 2 - String otherServer >>>
@@ -50,7 +53,13 @@ public class Main {
                         System.out.println("Enter Client Name: ");
                         String clientName = in.nextLine();
 
-                        multiplayer.joinGame(hostName);
+                        Thread clientThread = multiplayer.joinGame(hostName, clientName);
+                        optionChosen = true;
+                        try {
+                            clientThread.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                     //enter 'leave' to disconnect >>> may need to be in the do-while loop in function
                     //multiplayer.disconnect()
@@ -60,6 +69,7 @@ public class Main {
                     // Multiplayer game = new Multiplayer;
                 } while (!optionChosen);
             } else if (choice == 3) {
+                GameUtils.clearScreen();   //??? check performance
                 Config.runConfig();
 
             } else if (choice == -1) {

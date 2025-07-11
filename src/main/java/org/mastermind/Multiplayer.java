@@ -24,8 +24,7 @@ public class Multiplayer {
     private Thread clientThread;
 
     public Multiplayer(GameStats game, Scanner scanner) {
-        this.game = game;
-        this.scanner = scanner;
+        this(game, scanner, 32581);
     }
 
     public Multiplayer(GameStats game, Scanner scanner, int port) {
@@ -42,7 +41,7 @@ public class Multiplayer {
         return winner;
     }
 
-    public void startServer(String serverName) {
+    public Thread startServer(String serverName) {
         keepListening = true;
         keepPlaying = false;
         startNewGame = true;
@@ -57,11 +56,13 @@ public class Multiplayer {
 
         //??? do I need to create a score??? could be inversely proportional to the
         //number of attempts?
+        return serverThread;
     }
 
-    public void joinGame(String otherServer) {
-        clientThread = new Thread(new Client(otherServer));
+    public Thread joinGame(String otherServer, String clientName) {
+        clientThread = new Thread(new Client(otherServer, clientName));
         clientThread.start();
+        return clientThread;
     }
 
     public void startGame() {
@@ -336,8 +337,9 @@ public class Multiplayer {
         String username;
         boolean startNewGame;
 
-        public Client(String host) {
+        public Client(String host, String clientName) {
             gameHost = host;
+            username = clientName;
             keepPlaying = false;
             startNewGame = false;
             winner = false;
