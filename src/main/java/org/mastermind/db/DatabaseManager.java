@@ -27,6 +27,7 @@ public class DatabaseManager {
             String sql = "CREATE TABLE IF NOT EXISTS GAME_INFO" +
                     "(TIME_ID INT PRIMARY KEY NOT NULL," +
                     "STATUS CHAR(50) NOT NULL," +
+                    "WINNER_NAME CHAR(50)," +
                     "ROUND INT NOT NULL)";
             stmt.executeUpdate(sql);
             stmt.close();
