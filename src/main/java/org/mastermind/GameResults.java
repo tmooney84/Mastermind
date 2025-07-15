@@ -6,6 +6,13 @@ public class GameResults {
     private long timeID;
     private int round;
 
+    public GameResults() {
+        this.status = null;
+        this.winnerName = null;
+        this.timeID = -1;
+        this.round = -1;
+    }
+
     public GameResults(String status, String winnerName, long timeID, int round) {
         this.status = status;
         this.winnerName = winnerName;

@@ -31,7 +31,7 @@ public class DatabaseManager {
                     "ROUND INT NOT NULL)";
             stmt.executeUpdate(sql);
             stmt.close();
-            conn.close();
+            //conn.close();  >>> seems like this will close the connection before it is returned
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName() + ": " + e.getMessage());

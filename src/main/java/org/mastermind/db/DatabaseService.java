@@ -1,12 +1,13 @@
 package org.mastermind.db;
 
-public class DatabaseService {
-    //getAllRounds >>> returns List<GameResults>
+import org.mastermind.GameResults;
+
+import java.util.List;
+
+public interface DatabaseService {
+    List<GameResults> getAllGameResultsByTime();
+
+    void saveGameResults(GameResults results);
+
+    boolean deleteAllGameResults();
 }
-
-
-
-/*
-Does it make sense to have a separate class for game results? In that class, I could
-build it at the end with the timestamp, winner/tie and rounds completed...
- */
