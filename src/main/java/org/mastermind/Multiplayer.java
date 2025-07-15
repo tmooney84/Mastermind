@@ -135,7 +135,7 @@ public class Multiplayer {
                     PrintWriter writer = new PrintWriter(output, true); //autoflush
 
                   /*
-                 //***may be a good idea to send username with the play game???
+                 //***may be a good idea to send userName with the play game???
                   So the three outcomes are "YOU WIN" "YOU LOSE" and "TIE"
                   -at the beginning of the game, the client should start with
                    "WAITING FOR OPPONENT'S GUESS", once the server player has
@@ -156,7 +156,7 @@ public class Multiplayer {
                         //on the "OK" if it is every time
 
                         //!!!!!!!!!!!!!!!!!!!!!!!!! pass "NEW_GAME SERVER_USERNAME"
-                        //and same for the Client username as well
+                        //and same for the Client userName as well
                         //*** creates a new game, but assumes this will be the last
                         writer.println("NEW_GAME");
                         startNewGame = false;
@@ -334,12 +334,12 @@ public class Multiplayer {
 
     class Client implements Runnable {
         String gameHost;
-        String username;
+        String userName;
         boolean startNewGame;
 
         public Client(String host, String clientName) {
             gameHost = host;
-            username = clientName;
+            userName = clientName;
             keepPlaying = false;
             startNewGame = false;
             winner = false;
@@ -349,8 +349,8 @@ public class Multiplayer {
             this.gameHost = gameHost;
         }
 
-        public void setUsername(String username) {
-            this.username = username;
+        public void setUsername(String userName) {
+            this.userName = userName;
         }
 
         public String getGameHost() {
@@ -358,7 +358,7 @@ public class Multiplayer {
         }
 
         public String getUsername() {
-            return username;
+            return userName;
         }
 
         public void run() {
@@ -386,7 +386,7 @@ public class Multiplayer {
                     }
 
                     // Yay! We're going to play a game. Acknowledge this command
-                    writer.println("OK " + username);
+                    writer.println("OK " + userName);
                     // And now gather the trees and setup our field
                     //gameField.trees.clear(); !!!!!!
                     response = reader.readLine();
